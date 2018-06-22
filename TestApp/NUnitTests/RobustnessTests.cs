@@ -24,53 +24,58 @@ namespace TestApp
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
+        
         public void Test001_DoubleEndedUniqueCollectionDoesntAcceptKeyDuplicates()
         {
-            var delist = new DoubleEndedUniqueCollection<int>();
-            delist.Add(123);
-            Console.WriteLine("Added " + 123);
-            delist.Add(789);
-            Console.WriteLine("Added " + 789);
-            delist.Add(456);
-            Console.WriteLine("Added " + 456);
-
-            var error = null as Exception;
-            try
+            Assert.Throws<ArgumentException>(() =>
             {
-                Console.WriteLine("Trying to add " + 789 + " again");
+                var delist = new DoubleEndedUniqueCollection<int>();
+                delist.Add(123);
+                Console.WriteLine("Added " + 123);
                 delist.Add(789);
                 Console.WriteLine("Added " + 789);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Couldn't add " + 789 + " again... removing it...");
-                delist.Remove(789);
-                error = ex;
-            }
-            Assert.AreEqual(delist.Contains(789), false);
+                delist.Add(456);
+                Console.WriteLine("Added " + 456);
 
-            Console.WriteLine("Re-adding " + 789);
-            delist.Add(789);
-            Console.WriteLine("Added " + 789);
-            Assert.AreEqual(delist.Contains(789), true);
+                var error = null as Exception;
+                try
+                {
+                    Console.WriteLine("Trying to add " + 789 + " again");
+                    delist.Add(789);
+                    Console.WriteLine("Added " + 789);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Couldn't add " + 789 + " again... removing it...");
+                    delist.Remove(789);
+                    error = ex;
+                }
+                Assert.AreEqual(delist.Contains(789), false);
 
-            if (error != null)
-            {
-                Console.WriteLine("Re-throwing the exception we caught...");
-                throw error;
-            }
+                Console.WriteLine("Re-adding " + 789);
+                delist.Add(789);
+                Console.WriteLine("Added " + 789);
+                Assert.AreEqual(delist.Contains(789), true);
+
+                if (error != null)
+                {
+                    Console.WriteLine("Re-throwing the exception we caught...");
+                    throw error;
+                }
+            });
         }
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Test]        
         public void Test002_CannotSetThePolicyOfANonEmptyCache()
         {
-            var nonEmptyCache = new MemoryCache<int, int>();
-            nonEmptyCache.SetPolicy(typeof(NoEvictionPolicy<,>));
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var nonEmptyCache = new MemoryCache<int, int>();
+                nonEmptyCache.SetPolicy(typeof(NoEvictionPolicy<,>));
 
-            nonEmptyCache.Add(1, 1);
-            nonEmptyCache.Policy = null;
+                nonEmptyCache.Add(1, 1);
+                nonEmptyCache.Policy = null;
+            });
         }
 
         [Test]
